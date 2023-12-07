@@ -95,7 +95,7 @@ const ReleaseBookData = () => {
     };
 
     const sortData = (key, direction) => {
-        const sorted = [...data].sort((a, b) => {
+        const sorted = [...filteredData].sort((a, b) => {
             if (a[key] < b[key]) {
                 return direction === 'asc' ? -1 : 1;
             }
@@ -190,16 +190,6 @@ const ReleaseBookData = () => {
                 skipEmptyLines: true
             }).data;
 
-            // const data1 = parsedData_cat.map((row) => {
-            //     const newRow = {};
-
-            //     for (const key in row) {
-            //         const newKey = key.replace(/\s+/g, '_').toLowerCase();
-            //         newRow[newKey] = row[key];
-            //     }
-            //     return newRow;
-            // });
-
             setCatData(parsedData_cat);
 
             //Fetch Release Book Data
@@ -246,7 +236,7 @@ const ReleaseBookData = () => {
                         <thead>
                             <tr>
                                 {Object.keys(catData[0]).map((header, index) => (
-                                    <th scope="col" width="100px" key={index} style={headerStyles} className={getCellStyle(-1)} onClick={() => handleSubProd(header)}>{header}</th>
+                                    <td scope="col" width="100px" key={index} style={headerStyles} className={getCellStyle(-1)} onClick={() => handleSubProd(header)}>{header}</td>
                                 ))}
                             </tr>
                         </thead>
@@ -284,17 +274,17 @@ const ReleaseBookData = () => {
                         <tr>
                             <th>sub_product</th>
                             <th onClick={() => requestSort('function')}>function</th>
-                            <th onClick={() => requestSort('sub_function')}>sub_function</th>
-                            <th className='w-25'>release_summary</th>
-                            <th className='max-width-150'>release_note</th>
-                            <th onClick={() => requestSort('slack_link')}>slack_link</th>
-                            <th onClick={() => requestSort('product_video')}>product_video</th>
-                            <th onClick={() => requestSort('cs_video_int')} className='text-center'>cs_video_int</th>
-                            <th onClick={() => requestSort('cs_video_ext')} className='text-center'>cs_video_ext</th>
-                            <th onClick={() => requestSort('release_note_link')} className='text-center'>release_note_link</th>
+                            <th onClick={() => requestSort('sub_function')}>sub function</th>
+                            <th className='w-25'>release summary</th>
+                            <th className='max-width-150'>release note</th>
+                            <th onClick={() => requestSort('slack_link')}>slack link</th>
+                            <th onClick={() => requestSort('product_video')}>product video</th>
+                            <th onClick={() => requestSort('cs_video_int')} className='text-center'>cs video internal</th>
+                            <th onClick={() => requestSort('cs_video_ext')} className='text-center'>cs video external</th>
+                            <th onClick={() => requestSort('release_note_link')} className='text-center'>release note link</th>
                             <th onClick={() => requestSort('documentation')} className='text-center'>documentation</th>
-                            <th onClick={() => requestSort('assigned_resource')} className='text-center'>assigned_resource</th>
-                            <th onClick={() => requestSort('cs_video_added_date')} className='text-center'>cs_video_added_date</th>
+                            <th onClick={() => requestSort('assigned_resource')} className='text-center'>assigned resource</th>
+                            <th onClick={() => requestSort('cs_video_added_date')} className='text-center'>cs video added date</th>
                         </tr>
                     )}
                 </thead>
@@ -316,7 +306,6 @@ const ReleaseBookData = () => {
                             <td className='text-center'>{row.assigned_resource}</td>
                             <td className='text-center'>{row.cs_video_added_date}</td>
                         </tr>
-
                     ))}
                 </tbody>
             </table>
