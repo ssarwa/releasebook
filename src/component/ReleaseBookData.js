@@ -79,6 +79,39 @@ const ReleaseBookData = () => {
         }
     };
 
+
+
+    const [sortedData, setSortedData] = useState(filteredData);
+    const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+
+    const requestSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+
+        setSortConfig({ key, direction });
+        sortData(key, direction);
+    };
+
+    const sortData = (key, direction) => {
+        const sorted = [...data].sort((a, b) => {
+            if (a[key] < b[key]) {
+                return direction === 'asc' ? -1 : 1;
+            }
+            if (a[key] > b[key]) {
+                return direction === 'asc' ? 1 : -1;
+            }
+            return 0;
+        });
+        setSortedData(sorted);
+        setFilteredData(sorted)
+
+    };
+
+
+
+
     const handleCatClick = (cell) => {
         setFunc(cell);
     }
@@ -92,8 +125,14 @@ const ReleaseBookData = () => {
         setFilteredData(newData)
     }
 
-    const handleFunc = (func) => {
-        const newData = data.filter((newval) => newval.function === func)
+    const handleSubProd = (val) => {
+        const newData = data.filter((newval) => newval.sub_product === val)
+        console.log(newData);
+        setFilteredData(newData)
+    }
+
+    const handleFunc = (val) => {
+        const newData = data.filter((newval) => newval.function === val)
         console.log(newData);
         setFilteredData(newData)
     }
@@ -207,7 +246,7 @@ const ReleaseBookData = () => {
                         <thead>
                             <tr>
                                 {Object.keys(catData[0]).map((header, index) => (
-                                    <th scope="col" width="100px" key={index} style={headerStyles} className={getCellStyle(-1)}>{header}</th>
+                                    <th scope="col" width="100px" key={index} style={headerStyles} className={getCellStyle(-1)} onClick={() => handleSubProd(header)}>{header}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -228,14 +267,14 @@ const ReleaseBookData = () => {
             </div>
             <br></br>
             <div>
-                &blsp;
+                &nbsp;
                 <input onChange={(e) => handleSearchData(e.target.value)}></input>
-                &blsp;
-                <label style={searchStyles}><input type="checkbox" checked={custVideo} onChange={handleCustVideo} className='checkbox-inline' style={searchStyles}></input>  Customer Videos</label>
-                &blsp;
-                <label style={searchStyles}><input type="checkbox" checked={intVideo} onChange={handleIntVideo} className='checkbox-inline'></input>Internal Videos</label>
-                &blsp;
-                <label style={searchStyles}><input type="checkbox" checked={productVideo} onChange={handleProductVideo} className='checkbox-inline' id="checkboxSuccess"></input>  Product Videos</label>
+                &nbsp;&nbsp;&nbsp;
+                <label style={searchStyles}><input type="checkbox" checked={custVideo} onChange={handleCustVideo} className='checkbox-inline' style={searchStyles}></input>&nbsp;Customer Videos</label>
+                &nbsp;&nbsp;&nbsp;
+                <label style={searchStyles}><input type="checkbox" checked={intVideo} onChange={handleIntVideo} className='checkbox-inline'></input>&nbsp;Internal Videos</label>
+                &nbsp;&nbsp;&nbsp;
+                <label style={searchStyles}><input type="checkbox" checked={productVideo} onChange={handleProductVideo} className='checkbox-inline' id="checkboxSuccess"></input>&nbsp;Product Videos</label>
 
             </div>
             <br></br>
@@ -244,18 +283,18 @@ const ReleaseBookData = () => {
                     {filteredData.length > 0 && (
                         <tr>
                             <th>sub_product</th>
-                            <th>function</th>
-                            <th>sub_function</th>
+                            <th onClick={() => requestSort('function')}>function</th>
+                            <th onClick={() => requestSort('sub_function')}>sub_function</th>
                             <th className='w-25'>release_summary</th>
                             <th className='max-width-150'>release_note</th>
-                            <th>slack_link</th>
-                            <th>product_video</th>
-                            <th className='text-center'>cs_video_int</th>
-                            <th className='text-center'>cs_video_ext</th>
-                            <th className='text-center'>release_note_link</th>
-                            <th className='text-center'>documentation</th>
-                            <th className='text-center'>assigned_resource</th>
-                            <th className='text-center'>cs_video_added_date</th>
+                            <th onClick={() => requestSort('slack_link')}>slack_link</th>
+                            <th onClick={() => requestSort('product_video')}>product_video</th>
+                            <th onClick={() => requestSort('cs_video_int')} className='text-center'>cs_video_int</th>
+                            <th onClick={() => requestSort('cs_video_ext')} className='text-center'>cs_video_ext</th>
+                            <th onClick={() => requestSort('release_note_link')} className='text-center'>release_note_link</th>
+                            <th onClick={() => requestSort('documentation')} className='text-center'>documentation</th>
+                            <th onClick={() => requestSort('assigned_resource')} className='text-center'>assigned_resource</th>
+                            <th onClick={() => requestSort('cs_video_added_date')} className='text-center'>cs_video_added_date</th>
                         </tr>
                     )}
                 </thead>
@@ -275,6 +314,7 @@ const ReleaseBookData = () => {
                             <td className='text-left'>{row.release_note_link}</td>
                             <td className='text-center'>{row.documentation}</td>
                             <td className='text-center'>{row.assigned_resource}</td>
+                            <td className='text-center'>{row.cs_video_added_date}</td>
                         </tr>
 
                     ))}
