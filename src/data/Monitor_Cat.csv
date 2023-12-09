@@ -1,0 +1,4 @@
+Advisor,Costs,Dashboard,Alert,Prometheus,Explore,Monitor Integration,Settings
+,AWS,,,PromQL,Metric Usage,Application,Notification Channel
+,GCP,,,,,Cloud,
+,Azure,,,,,Infra,

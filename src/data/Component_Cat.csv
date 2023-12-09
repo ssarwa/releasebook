@@ -1,0 +1,15 @@
+Secure,Monitor,Platform
+Admission Controller Int,Cloud-AWS,Agent
+Admission Controller,Cloud-GCP,OnPrem
+CLI Scanner,Cloud-Azure,Terraform Provider
+Registry Scanner,Prometheus Integration,
+Runtime Scanner,,
+Host Scanner,,
+SFC-AWS-CFT,,
+SFC-AWS-TF,,
+SFC-GCP-TF,,
+SFC-Azure-TF,,
+Cloud Connector,,
+Fargate,,
+Plugins-Jenkins,,
+Falco,,

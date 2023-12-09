@@ -1,4 +1,5 @@
 VM,,Posture,,IaC,Detection & Response,,Secure Integration,Onboarding,Home,Settings,Add On,Sage
+,,,,,,,,,,,,
 Dashboard,,Compliance,CSPM,,Falco,Policy/Rule,Jira,,,Notification Channel,,
 Legacy,,Compliance,KSPM,,Cloud (CDR),,Git,,,Event Forwarding,,
 Pipeline,,CIEM,IAM,,Malware Detection,,,,,,,

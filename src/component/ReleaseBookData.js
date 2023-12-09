@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import Data from '../ReleaseBook.csv';
-import CategoriesData from '../Categories.csv';
+import Data from '../data/ReleaseBook.csv';
+import SecureCatCSV from '../data/Secure_Cat.csv'
+import MonitorCatCSV from '../data/Monitor_Cat.csv'
+import PlatformCatCSV from '../data/Platform_Cat.csv'
+import UtilityCatCSV from '../data/Utility_Cat.csv'
+import ComponentCatCSV from '../data/Component_Cat.csv'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../Category.css'
 import Papa from 'papaparse';
@@ -10,10 +14,18 @@ import '../App.css';
 const ReleaseBookData = () => {
 
     const [catData, setCatData] = useState([]);
-    const [data, setData] = useState([]);
+    const [secureCatData, setSecureCatData] = useState([]);
+    const [monitorCatData, setMonitorCatData] = useState([]);
+    const [platformCatData, setPlatformCatData] = useState([]);
+    const [utilityCatData, setUtilityCatData] = useState([]);
+    const [componentCatData, setComponentCatData] = useState([]);
+
+
+    const [origData, setOrigData] = useState([]); //Stores original data - never changes
+    const [data, setData] = useState([]); //stores data based on category clicked on the top (secure, monitor, platform, etc)
+    const [filteredData, setFilteredData] = useState([]);
     const [search, setSearch] = useState('');
     const [func, setFunc] = useState('');
-    const [filteredData, setFilteredData] = useState([]);
     const [custVideo, setCustVideo] = useState(false);
     const [intVideo, setIntVideo] = useState(false);
     const [productVideo, setProductVideo] = useState(false);
@@ -80,7 +92,7 @@ const ReleaseBookData = () => {
     };
 
 
-
+    //Implement Sorting on every column...
     const [sortedData, setSortedData] = useState(filteredData);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
@@ -109,15 +121,7 @@ const ReleaseBookData = () => {
 
     };
 
-
-
-
-    const handleCatClick = (cell) => {
-        setFunc(cell);
-    }
-
-    const handleSearchData = (search) => {
-
+    const SearchReleaseBookData = (search) => {
         setSearch(search)
         const newData = data.filter((row) =>
             row.release_note.toLowerCase().includes(search.toLowerCase()) || row.release_summary.toLowerCase().includes(search.toLowerCase())
@@ -125,72 +129,245 @@ const ReleaseBookData = () => {
         setFilteredData(newData)
     }
 
-    const handleSubProd = (val) => {
-        const newData = data.filter((newval) => newval.sub_product === val)
-        console.log(newData);
-        setFilteredData(newData)
-    }
 
-    const handleFunc = (val) => {
-        const newData = data.filter((newval) => newval.function === val)
-        console.log(newData);
-        setFilteredData(newData)
-    }
-
-    const handleFilterData = (search) => {
-        const newData = filteredData.filter((newval) => newval.sub_product === 'Settings')
-        setData(newData)
-    }
-
-    const handleCustVideo = () => {
+    const SearchCustVideo = () => {
         setCustVideo(!custVideo);
         if (!custVideo) {
             const newData = filteredData.filter((newval) => newval.cs_video_ext === 'Video')
             setFilteredData(newData);
         }
         else {
-            handleSearchData(search);
+            SearchReleaseBookData(search);
         }
     }
 
-    const handleIntVideo = () => {
+    const searchIntVideo = () => {
         setIntVideo(!intVideo);
         if (!intVideo) {
             const newData = filteredData.filter((newval) => newval.cs_video_int === 'Video')
             setFilteredData(newData);
         }
         else {
-            handleSearchData(search);
+            SearchReleaseBookData(search);
         }
     }
 
-    const handleProductVideo = () => {
+    const searchProductVideo = () => {
         setProductVideo(!productVideo);
         if (!productVideo) {
             const newData = filteredData.filter((newval) => newval.product_video === 'Video')
             setFilteredData(newData);
         }
         else {
-            handleSearchData(search);
+            SearchReleaseBookData(search);
         }
     }
 
 
+    const filterCategories = (cat) => {
+
+        const a = filterReleaseData(cat)
+        setFilteredData(a);
+        setData(a);
+
+        SearchReleaseBookData(search);
+
+
+        switch (cat) {
+            case 'all':
+                return setCatData(secureCatData) // create csv for all and use that here...
+            case 'secure':
+                return setCatData(secureCatData);
+            case 'monitor':
+                return setCatData(monitorCatData);
+            case 'platform':
+                return setCatData(platformCatData);
+            case 'utility':
+                return setCatData(utilityCatData);
+            default:
+                return setCatData(secureCatData);
+        }
+
+    }
+
+    const filterReleaseData = (cat, prod) => {
+        switch (cat) {
+            case 'all':
+                return origData;
+            case 'secure':
+                var newData1 = origData.filter((newval) => {
+                    return newval.category.toLowerCase() === 'product feature' && newval.product.toLowerCase() === 'secure';
+                });
+                return newData1;
+            case 'monitor':
+                var newData1 = origData.filter((newval) => {
+                    return newval.category.toLowerCase() === 'product feature' && newval.product.toLowerCase() === 'monitor';
+                });
+                return newData1;
+            case 'platform':
+                var newData1 = origData.filter((newval) => {
+                    return newval.category.toLowerCase() === 'product feature' && newval.product.toLowerCase() === 'platform';
+                });
+                return newData1;
+            case 'utility':
+                var newData1 = origData.filter((newval) => {
+                    return newval.category.toLowerCase() === 'utility';
+                });
+                return newData1;
+            default:
+                var newData1 = origData.filter((newval) => {
+                    return newval.category.toLowerCase() === 'product feature' && newval.product.toLowerCase() === 'secure';
+                });
+                return newData1;
+        }
+
+    }
+
+    const handleProd = (val) => {
+
+        const newData = data.filter((newval) => newval.product.toLowerCase() === val.toLowerCase())
+
+        console.log(catData);
+        const newCatData = catData.filter((newval) => newval.product.toLowerCase() === val.toLowerCase())
+
+        setFilteredData(newData)
+        setCatData(newCatData)
+    }
+
+    const handleSubProd = (val) => {
+        const newData = data.filter((newval) => newval.sub_product.toLowerCase() === val.toLowerCase())
+        setFilteredData(newData)
+        setData(newData)
+    }
+
+    const handleFunc = (val) => {
+        const newData = data.filter((newval) => newval.function.toLowerCase() === val.toLowerCase())
+        setFilteredData(newData)
+        setData(newData)
+    }
+
+    //Not working... need to check
+    const csvToArray = async (fn) => {
+        //Fetch Secure Category Data
+        const response_sec_cat = await fetch(MonitorCatCSV);
+        const reader_sec_cat = response_sec_cat.body.getReader();
+        const result_sec_cat = await reader_sec_cat.read();
+        const decoder_sec_cat = new TextDecoder("utf-8");
+        const csvData_sec_cat = decoder_sec_cat.decode(result_sec_cat.value);
+        var parsedData_sec_cat = Papa.parse(csvData_sec_cat, {
+            header: true,
+            skipEmptyLines: true
+        }).data;
+
+        // const sanitizedData_sec_cat = parsedData_sec_cat.map((row) => {
+        //     const newRow = {};
+        //     for (const key in row) {
+        //         const newKey = key.replace(/\s+/g, '_').toLowerCase();
+        //         newRow[newKey] = row[key];
+        //     }
+        //     return newRow;
+        // });
+        return parsedData_sec_cat;
+    }
+
     useEffect(() => {
         const fetchData = async () => {
 
-            //Fetch Category Data
-            const response_cat = await fetch(CategoriesData);
-            const reader_cat = response_cat.body.getReader();
-            const result_cat = await reader_cat.read();
-            const decoder_cat = new TextDecoder("utf-8");
-            const csvData_cat = decoder_cat.decode(result_cat.value);
-            var parsedData_cat = Papa.parse(csvData_cat, {
+            //Fetch Secure Category Data
+            const response_sec_cat = await fetch(SecureCatCSV);
+            const reader_sec_cat = response_sec_cat.body.getReader();
+            const result_sec_cat = await reader_sec_cat.read();
+            const decoder_sec_cat = new TextDecoder("utf-8");
+            const csvData_sec_cat = decoder_sec_cat.decode(result_sec_cat.value);
+            var parsedData_sec_cat = Papa.parse(csvData_sec_cat, {
                 header: true,
                 skipEmptyLines: true
             }).data;
 
-            setCatData(parsedData_cat);
+            const sanitizedData_sec_cat = parsedData_sec_cat.map((row) => {
+                const newRow = {};
+                for (const key in row) {
+                    const newKey = key.replace(/\s+/g, '_').toLowerCase();
+                    newRow[newKey] = row[key];
+                }
+                return newRow;
+            });
+
+            setSecureCatData(sanitizedData_sec_cat);
+
+            //Fetch Monitor Category Data
+            const response_mon_cat = await fetch(MonitorCatCSV);
+            const reader_mon_cat = response_mon_cat.body.getReader();
+            const result_mon_cat = await reader_mon_cat.read();
+            const decoder_mon_cat = new TextDecoder("utf-8");
+            const csvData_mon_cat = decoder_mon_cat.decode(result_mon_cat.value);
+            var parsedData_mon_cat = Papa.parse(csvData_mon_cat, {
+                header: true,
+                skipEmptyLines: true
+            }).data;
+
+            console.log(parsedData_mon_cat);
+            const sanitizedData_mon_cat = parsedData_mon_cat.map((row) => {
+                const newRow = {};
+                for (const key in row) {
+                    const newKey = key.replace(/\s+/g, '_').toLowerCase();
+                    newRow[newKey] = row[key];
+                }
+                return newRow;
+            });
+
+            setMonitorCatData(sanitizedData_mon_cat);
+
+            //Fetch Platform Category Data
+            const response_plat_cat = await fetch(PlatformCatCSV);
+            const reader_plat_cat = response_plat_cat.body.getReader();
+            const result_plat_cat = await reader_plat_cat.read();
+            const decoder_plat_cat = new TextDecoder("utf-8");
+            const csvData_plat_cat = decoder_plat_cat.decode(result_plat_cat.value);
+            var parsedData_plat_cat = Papa.parse(csvData_plat_cat, {
+                header: true,
+                skipEmptyLines: true
+            }).data;
+
+            console.log(parsedData_plat_cat);
+            const sanitizedData_plat_cat = parsedData_plat_cat.map((row) => {
+                const newRow = {};
+                for (const key in row) {
+                    const newKey = key.replace(/\s+/g, '_').toLowerCase();
+                    newRow[newKey] = row[key];
+                }
+                return newRow;
+            });
+
+            setPlatformCatData(sanitizedData_plat_cat);
+
+            //Fetch Utility Category Data
+            const response_uti_cat = await fetch(UtilityCatCSV);
+            const reader_uti_cat = response_uti_cat.body.getReader();
+            const result_uti_cat = await reader_uti_cat.read();
+            const decoder_uti_cat = new TextDecoder("utf-8");
+            const csvData_uti_cat = decoder_uti_cat.decode(result_uti_cat.value);
+            var parsedData_uti_cat = Papa.parse(csvData_uti_cat, {
+                header: true,
+                skipEmptyLines: true
+            }).data;
+
+            console.log(parsedData_uti_cat);
+            const sanitizedData_uti_cat = parsedData_uti_cat.map((row) => {
+                const newRow = {};
+                for (const key in row) {
+                    const newKey = key.replace(/\s+/g, '_').toLowerCase();
+                    newRow[newKey] = row[key];
+                }
+                return newRow;
+            });
+
+            setUtilityCatData(sanitizedData_uti_cat);
+
+            setCatData(secureCatData)
+
+
+            //setCatData(sanitizedData_sec_cat);
 
             //Fetch Release Book Data
             const response = await fetch(Data);
@@ -203,11 +380,12 @@ const ReleaseBookData = () => {
                 skipEmptyLines: true
             }).data;
 
-            const filteredData = parsedData.filter((row) => {
-                return row.Category === 'Product Feature' && row.Product === 'Secure'
-            })
+            // const filteredData = parsedData.filter((row) => {
+            //     return row.Category === 'Product Feature' && row.Product === 'Secure'
+            // })
 
-            const sanitizedData = filteredData.map((row) => {
+
+            const sanitizedData = parsedData.map((row) => {
                 const newRow = {};
                 for (const key in row) {
                     const newKey = key.replace(/\s+/g, '_').toLowerCase();
@@ -216,6 +394,7 @@ const ReleaseBookData = () => {
                 return newRow;
             });
 
+            setOrigData(sanitizedData);
             setData(sanitizedData);
             setFilteredData(sanitizedData)
         };
@@ -225,7 +404,20 @@ const ReleaseBookData = () => {
     return (
         <div>
 
+
             <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <td scope="col" width="100px" className={getCellStyle(5)} style={headerStyles} onClick={() => filterCategories('all')}>All</td>
+                            <td scope="col" width="100px" className={getCellStyle(5)} style={headerStyles} onClick={() => filterCategories('secure')}>Secure</td>
+                            <td scope="col" width="100px" className={getCellStyle(6)} style={headerStyles} onClick={() => filterCategories('monitor')}>Monitor</td>
+                            <td scope="col" width="100px" className={getCellStyle(7)} style={headerStyles} onClick={() => filterCategories('platform')}>Platform</td>
+                            <td scope="col" width="100px" className={getCellStyle(8)} style={headerStyles} onClick={() => filterCategories('utility')}>Utility</td>
+                        </tr>
+                    </thead>
+                </table>
+
                 <h1 className="text-center" style={titleStyles}>
                     Sysdig Secure Product Feature Releases
                 </h1>
@@ -249,6 +441,7 @@ const ReleaseBookData = () => {
                                 </tr>
                             ))}
 
+
                         </tbody>
                     </table>
 
@@ -258,13 +451,13 @@ const ReleaseBookData = () => {
             <br></br>
             <div>
                 &nbsp;
-                <input onChange={(e) => handleSearchData(e.target.value)}></input>
+                <input onChange={(e) => SearchReleaseBookData(e.target.value)}></input>
                 &nbsp;&nbsp;&nbsp;
-                <label style={searchStyles}><input type="checkbox" checked={custVideo} onChange={handleCustVideo} className='checkbox-inline' style={searchStyles}></input>&nbsp;Customer Videos</label>
+                <label style={searchStyles}><input type="checkbox" checked={custVideo} onChange={SearchCustVideo} className='checkbox-inline' style={searchStyles}></input>&nbsp;Customer Videos</label>
                 &nbsp;&nbsp;&nbsp;
-                <label style={searchStyles}><input type="checkbox" checked={intVideo} onChange={handleIntVideo} className='checkbox-inline'></input>&nbsp;Internal Videos</label>
+                <label style={searchStyles}><input type="checkbox" checked={intVideo} onChange={searchIntVideo} className='checkbox-inline'></input>&nbsp;Internal Videos</label>
                 &nbsp;&nbsp;&nbsp;
-                <label style={searchStyles}><input type="checkbox" checked={productVideo} onChange={handleProductVideo} className='checkbox-inline' id="checkboxSuccess"></input>&nbsp;Product Videos</label>
+                <label style={searchStyles}><input type="checkbox" checked={productVideo} onChange={searchProductVideo} className='checkbox-inline' id="checkboxSuccess"></input>&nbsp;Product Videos</label>
 
             </div>
             <br></br>
@@ -272,7 +465,10 @@ const ReleaseBookData = () => {
                 <thead>
                     {filteredData.length > 0 && (
                         <tr>
-                            <th>sub_product</th>
+
+                            <th onClick={() => requestSort('category')}>category</th>
+                            <th onClick={() => requestSort('product')}>product</th>
+                            <th onClick={() => requestSort('product')}>sub product</th>
                             <th onClick={() => requestSort('function')}>function</th>
                             <th onClick={() => requestSort('sub_function')}>sub function</th>
                             <th className='w-25'>release summary</th>
@@ -291,7 +487,8 @@ const ReleaseBookData = () => {
                 <tbody>
                     {filteredData.map((row, index) => (
                         <tr key={index}>
-
+                            <td className='text-center'>{row.category}</td>
+                            <td className='text-center'>{row.product}</td>
                             <td className='text-center'>{row.sub_product}</td>
                             <td className='text-center'>{row.function}</td>
                             <td className='text-center'>{row.sub_function}</td>
