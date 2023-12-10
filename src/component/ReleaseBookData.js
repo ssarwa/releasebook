@@ -170,7 +170,7 @@ const ReleaseBookData = () => {
         setFilteredData(a);
         setData(a);
 
-        SearchReleaseBookData(search);
+
 
 
         switch (cat) {
